@@ -22,6 +22,22 @@ declare module 'cordova-plugin-contacts-x' {
     static find(success: (result: ContactX[]) => void, error: (error: ContactXError) => void);
 
     /**
+     * Create a new contact
+     *
+     * @param success
+     * @param error
+     */
+    static create(success: (result: ContactX[]) => void, error: (error: ContactXError) => void, contactData: any);
+
+    /**
+     * Deletes a contact
+     *
+     * @param success
+     * @param error
+     */
+    static delete(success: (result: ContactX[]) => void, error: (error: ContactXError) => void, contactIdentifier: string);
+
+    /**
      * Check permission is available
      *
      * @param success

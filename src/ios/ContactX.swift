@@ -81,10 +81,10 @@ class ContactX {
     }
 
     /**
-     Returns PostalAddresses
+     Returns postal addresses
      */
     func getPostalAddresses() -> [NSDictionary] {
-        return self.getLabeledValues(from: self.contact.emailAddresses)
+        return self.getLabeledValues(from: self.contact.postalAddresses)
     }
 
     /**
@@ -123,7 +123,7 @@ class ContactX {
     }
 
     /**
-     Returns the contact json
+     Returns the contact responding json
      */
     func getJson() -> NSDictionary {
         return [

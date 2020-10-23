@@ -60,6 +60,68 @@ import Contacts
         }
     }
 
+    @objc(create:)
+    func create(command: CDVInvokedUrlCommand) {
+        _callbackId = command.callbackId;
+
+        let createContactData: AnyObject = command.argument(at: 0)! as AnyObject
+
+        self.commandDelegate.run {
+
+            let contact = CNMutableContact()
+
+            // set namePrefix
+            contact.namePrefix = createContactData.namePrefix
+
+            // set middleName
+            contact.middleName = createContactData.middleName
+
+            // set familyName
+            contact.familyName = createContactData.familyName
+
+            // set nameSuffix
+            contact.nameSuffix = createContactData.nameSuffix
+
+            // set jobTitle
+            contact.jobTitle = createContactData.jobTitle
+
+            // set organizationName
+            contact.organizationName = createContactData.organizationName
+
+            // set postalAddresses
+            //contact.postalAddresses.append()
+
+            // set emailAddresses
+            //contact.emailAddresses.append()
+
+            // set urlAddresses
+            //contact.urlAddresses.append()
+
+            // set phoneNumbers
+            //contact.phoneNumbers.append()
+
+            // set birthday
+            /*let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd"
+            dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+            let date = dateFormatter.date(from: "2015-04-01")
+            let calendar = Calendar.current
+            let components = calendar.dateComponents([.year, .month, .day], from: date!)
+            contact.birthday = components*/
+
+            // create image
+
+            // cordove result
+            let result:CDVPluginResult = CDVPluginResult(status: CDVCommandStatus_OK);
+            self.commandDelegate.send(result, callbackId: self._callbackId)
+        }
+    }
+
+    @objc(delete:)
+    func delete(command: CDVInvokedUrlCommand) {
+
+    }
+
     @objc(hasPermission:)
     func hasPermission(command: CDVInvokedUrlCommand) {
         _callbackId = command.callbackId;

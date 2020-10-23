@@ -9,6 +9,11 @@ declare module 'cordova-plugin-contacts-x' {
     displayName: string;
 
     /**
+     * name prefix of the contact
+     */
+    namePrefix: string;
+
+    /**
      * first name (given name) of the contact
      */
     firstName: string;
@@ -23,10 +28,40 @@ declare module 'cordova-plugin-contacts-x' {
      */
     familyName: string;
 
+    /**
+     * name suffix of the contact
+     */
+    nameSuffix: string;
 
     /**
-     * unformatted phone-numbers of the contact
+     * job title of the contact
      */
-    phoneNumbers: string[];
+    jobTitle: string;
+
+    /**
+     * organization name of the contact
+     */
+    organizationName: string;
+
+
+    /**
+     * unformatted phone-numbers of the contact with labels
+     */
+    phoneNumbers: {label: string, value: string}[];
+
+    /**
+     * unformatted email addresses of the contact with labels
+     */
+    emailAddresses: {label: string, value: string}[];
+
+    /**
+     * unformatted postal addresses of the contact with labels
+     */
+    postalAddresses: {label: string, value: {street: string, city: string, state: string, postalCode: string, isoCountryCode: string}}[];
+
+    /**
+     * unformatted url addresses of the contact with labels
+     */
+    urlAddresses: {label: string, value: string}[];
   }
 }

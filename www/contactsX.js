@@ -12,6 +12,14 @@ var contactsX = {
     exec(success, error, 'ContactsX', 'find', []);
   },
 
+  create: function (success, error, contactData) {
+    exec(success, error, 'ContactsX', 'create', [contactData]);
+  },
+
+  delete: function (success, error, contactIdentifier) {
+    exec(success, error, 'ContactsX', 'delete', [contactIdentifier]);
+  },
+
   hasPermission: function (success, error) {
     exec(success, error, 'ContactsX', 'hasPermission', []);
   },
