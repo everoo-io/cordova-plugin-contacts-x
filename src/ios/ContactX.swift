@@ -2,42 +2,89 @@ import Contacts
 
 class ContactX {
 
+    /**
+    @var internal contact variable
+     */
     var contact: CNContact;
 
+    /**
+     Constructor
+     */
     init(contact: CNContact) {
         self.contact = contact
+    }
+
+    /**
+     Returns the json structure for a CNLabeledValue for generic type NSString
+     */
+    func getLabeledValueDictionary(obj: CNLabeledValue<NSString>) -> NSDictionary {
+        return [
+            "label": obj.label ?? "",
+            "value": obj.value
+        ]
+    }
+
+    /**
+     Returns the json structure for a CNLabeledValue for generic type CNPhoneNumber
+     */
+    func getLabeledValueDictionary(obj: CNLabeledValue<CNPhoneNumber>) -> NSDictionary {
+        return [
+            "label": obj.label ?? "",
+            "value": obj.value.stringValue
+        ]
+    }
+
+    /**
+     Returns the json structure for a CNLabeledValue for generic type CNPostalAddress
+     */
+    func getLabeledValueDictionary(obj: CNLabeledValue<CNPostalAddress>) -> NSDictionary {
+        return [
+            "label": obj.label ?? "",
+            "value": [
+                "street": obj.value.street,
+                "city": obj.value.city,
+                "state": obj.value.state,
+                "postalCode": obj.value.postalCode,
+                "isoCountryCode": obj.value.isoCountryCode
+            ]
+        ]
+    }
+
+    /**
+     Returns LabeledValues for generic type NSString
+     */
+    func getLabeledValues(from: [CNLabeledValue<NSString>]) -> [NSDictionary] {
+        let labeledValues: [NSDictionary] = from.map { (ob: CNLabeledValue<NSString>) -> NSDictionary in
+            return self.getLabeledValueDictionary(obj: ob)
+        }
+        return labeledValues;
+    }
+
+    /**
+     Returns LabeledValues for generic type CNPhoneNumbers
+     */
+    func getLabeledValues(from: [CNLabeledValue<CNPhoneNumber>]) -> [NSDictionary] {
+        let labeledValues: [NSDictionary] = from.map { (ob: CNLabeledValue<CNPhoneNumber>) -> NSDictionary in
+            return self.getLabeledValueDictionary(obj: ob)
+        }
+        return labeledValues;
+    }
+
+    /**
+     Returns LabeledValues for generic type CNPostalAddress
+     */
+    func getLabeledValues(from: [CNLabeledValue<CNPostalAddress>]) -> [NSDictionary] {
+        let labeledValues: [NSDictionary] = from.map { (ob: CNLabeledValue<CNPostalAddress>) -> NSDictionary in
+            return self.getLabeledValueDictionary(obj: ob)
+        }
+        return labeledValues;
     }
 
     /**
      Returns PostalAddresses
      */
     func getPostalAddresses() -> [NSDictionary] {
-        let postalAddresses: [NSDictionary] = self.contact.postalAddresses.map { (ob: CNLabeledValue<CNPostalAddress>) -> NSDictionary in
-            return [
-                "label": ob.label ?? "private",
-                "value": [
-                    "street": ob.value.street,
-                    "city": ob.value.city,
-                    "state": ob.value.state,
-                    "postalCode": ob.value.postalCode,
-                    "isoCountryCode": ob.value.isoCountryCode
-                ]
-            ]
-        }
-        return postalAddresses;
-    }
-
-    /**
-     Returns LabeledValues
-     */
-    func getLabeledValues(from: [CNLabeledValue<NSString>]) -> [NSDictionary] {
-        let labeledValues: [NSDictionary] = from.map { (ob: CNLabeledValue<NSString>) -> NSDictionary in
-            return [
-                "label": ob.label ?? "",
-                "value": ob.value
-            ]
-        }
-        return labeledValues;
+        return self.getLabeledValues(from: self.contact.emailAddresses)
     }
 
     /**
@@ -58,13 +105,7 @@ class ContactX {
      Returns all phone numbers
      */
     func getPhoneNumbers() -> [NSDictionary] {
-        let phoneNumbers: [NSDictionary] = self.contact.phoneNumbers.map { (ob: CNLabeledValue<CNPhoneNumber>) -> NSDictionary in
-            return [
-                "label": ob.label ?? "private",
-                "value": ob.value.stringValue
-            ]
-        }
-        return phoneNumbers;
+        return self.getLabeledValues(from: self.contact.phoneNumbers)
     }
 
     /**
