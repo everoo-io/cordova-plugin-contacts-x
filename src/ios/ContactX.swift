@@ -1,5 +1,4 @@
 import Contacts
-import DateFormatter
 
 class ContactX {
 
@@ -9,32 +8,83 @@ class ContactX {
         self.contact = contact
     }
 
-    func getJson() -> NSDictionary {
-
-        /*let postalAddresses: [String] = self.contact.postalAddresses.map { (ob: CNLabeledValue<CNPostalAddress>) -> String in
-            return ob.value.stringValue
-        }*/
-        let postalAddresses = [];
-
-        let emailAddresses: [String] = self.contact.emailAddresses.map { (ob: CNLabeledValue<CNLabeledValue>) -> String in
-            return ob.value.stringValue
+    /**
+     Returns PostalAddresses
+     */
+    func getPostalAddresses() -> [NSDictionary] {
+        let postalAddresses: [NSDictionary] = self.contact.postalAddresses.map { (ob: CNLabeledValue<CNPostalAddress>) -> NSDictionary in
+            return [
+                "label": ob.label ?? "private",
+                "value": [
+                    "street": ob.value.street,
+                    "city": ob.value.city,
+                    "state": ob.value.state,
+                    "postalCode": ob.value.postalCode,
+                    "isoCountryCode": ob.value.isoCountryCode
+                ]
+            ]
         }
+        return postalAddresses;
+    }
 
-        let urls: [String] = self.contact.urls.map { (ob: CNLabeledValue<CNLabeledValue>) -> String in
-            return ob.value.stringValue
+    /**
+     Returns LabeledValues
+     */
+    func getLabeledValues(from: [CNLabeledValue<NSString>]) -> [NSDictionary] {
+        let labeledValues: [NSDictionary] = from.map { (ob: CNLabeledValue<NSString>) -> NSDictionary in
+            return [
+                "label": ob.label ?? "",
+                "value": ob.value
+            ]
         }
+        return labeledValues;
+    }
 
-        let phoneNumbers: [String] = self.contact.phoneNumbers.map { (ob: CNLabeledValue<CNPhoneNumber>) -> String in
-            return ob.value.stringValue
+    /**
+     Returns all email addresses
+     */
+    func getEmailAddresses() -> [NSDictionary] {
+        return self.getLabeledValues(from: self.contact.emailAddresses)
+    }
+
+    /**
+     Returns all url addresses
+     */
+    func getUrlAddresses() -> [NSDictionary] {
+        return self.getLabeledValues(from: self.contact.urlAddresses)
+    }
+
+    /**
+     Returns all phone numbers
+     */
+    func getPhoneNumbers() -> [NSDictionary] {
+        let phoneNumbers: [NSDictionary] = self.contact.phoneNumbers.map { (ob: CNLabeledValue<CNPhoneNumber>) -> NSDictionary in
+            return [
+                "label": ob.label ?? "private",
+                "value": ob.value.stringValue
+            ]
         }
+        return phoneNumbers;
+    }
 
-        let birthday = nil;
-        if self.contact.birthday != nil {
+    /**
+     Returns a corresponding date string for the contacts birthday
+     */
+    func getBirthdayDateString() -> String {
+        var birthdayString: String = "";
+        if let birthday: Date = self.contact.birthday?.date {
             let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "dd-MMM-yyyy"
-            birthday = dateFormatter.string(from: self.contact.birthday)
+            dateFormatter.dateFormat = "yyyy-MM-dd"
+            dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+            birthdayString = dateFormatter.string(from: birthday)
         }
+        return birthdayString;
+    }
 
+    /**
+     Returns the contact json
+     */
+    func getJson() -> NSDictionary {
         return [
             "id": self.contact.identifier,
             "namePrefix": self.contact.namePrefix,
@@ -44,13 +94,14 @@ class ContactX {
             "nameSuffix": self.contact.nameSuffix,
             "jobTitle": self.contact.jobTitle,
             "organizationName": self.contact.organizationName,
-            "postalAddresses": postalAddresses,
-            "emailAddresses": emailAddresses,
-            "urls": urls,
-            "phoneNumbers": phoneNumbers,
-            "birthday": birthday,
+            "postalAddresses": self.getPostalAddresses(),
+            "emailAddresses": self.getEmailAddresses(),
+            "urlAddresses": self.getUrlAddresses(),
+            "phoneNumbers": self.getPhoneNumbers(),
+            "birthday": self.getBirthdayDateString(),
             "hasImage": self.contact.imageDataAvailable//,
             //"note": self.contact.note
         ];
     }
 }
+

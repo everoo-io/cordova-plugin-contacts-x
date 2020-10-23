@@ -31,7 +31,7 @@ import Contacts
                                    CNContactPostalAddressesKey,
                                    CNContactEmailAddressesKey,
                                    CNContactUrlAddressesKey,
-                                   CNContactPhoneNumbersKey
+                                   CNContactPhoneNumbersKey,
                                    CNContactBirthdayKey,
                                    CNContactImageDataAvailableKey//,
                                    //CNContactNoteKey
