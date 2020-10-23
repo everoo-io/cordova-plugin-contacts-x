@@ -21,10 +21,21 @@ import Contacts
                     return;
                 }
                 var contacts = [ContactX]()
-                let keysToFetch = [CNContactGivenNameKey,
+                let keysToFetch = [CNContactNamePrefixKey,
+                                   CNContactGivenNameKey,
                                    CNContactMiddleNameKey,
                                    CNContactFamilyNameKey,
-                                   CNContactPhoneNumbersKey]
+                                   CNContactNameSuffixKey,
+                                   CNContactJobTitleKey,
+                                   CNContactOrganizationNameKey,
+                                   CNContactPostalAddressesKey,
+                                   CNContactEmailAddressesKey,
+                                   CNContactUrlAddressesKey,
+                                   CNContactPhoneNumbersKey
+                                   CNContactBirthdayKey,
+                                   CNContactImageDataAvailableKey//,
+                                   //CNContactNoteKey
+                                   ]
                 let request = CNContactFetchRequest(keysToFetch: keysToFetch as [NSString])
 
                     do {
