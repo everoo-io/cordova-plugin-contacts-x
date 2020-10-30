@@ -69,13 +69,20 @@ public class ContactsX extends CordovaPlugin {
                     ContactsContract.Contacts._ID,
                     ContactsContract.Data.CONTACT_ID,
                     ContactsContract.Contacts.DISPLAY_NAME,
+                    ContactsContract.CommonDataKinds.StructuredName.PREFIX,
                     ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME,
                     ContactsContract.CommonDataKinds.StructuredName.MIDDLE_NAME,
                     ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME,
+                    ContactsContract.CommonDataKinds.StructuredName.SUFFIX,
+                    ContactsContract.CommonDataKinds.Organization.COMPANY,
+                    ContactsContract.CommonDataKinds.Organization.JOB_DESCRIPTION,
                     ContactsContract.CommonDataKinds.Contactables.DATA,
             };
-            String selection = ContactsContract.Data.MIMETYPE + " in (?, ?)";
+            String selection = ContactsContract.Data.MIMETYPE + " in (?, ?, ?, ?, ?)";
             String[] selectionArgs = new String[]{
+                    ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE,
+                    ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE,
+                    ContactsContract.CommonDataKinds.Website.CONTENT_ITEM_TYPE,
                     ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
                     ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE,
             };
@@ -124,6 +131,12 @@ public class ContactsX extends CordovaPlugin {
                     jsContact.put("id", contactId);
                     String displayName = contactsCursor.getString(contactsCursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
                     jsContact.put("displayName", displayName);
+                    JSONArray jsPostalAddresses = new JSONArray();
+                    jsContact.put("postalAddresses", jsPostalAddresses);
+                    JSONArray jsEmailAddresses = new JSONArray();
+                    jsContact.put("emailAddresses", jsEmailAddresses);
+                    JSONArray jsUrlAddresses = new JSONArray();
+                    jsContact.put("urlAddresses", jsUrlAddresses);
                     JSONArray jsPhoneNumbers = new JSONArray();
                     jsContact.put("phoneNumbers", jsPhoneNumbers);
 
@@ -135,24 +148,85 @@ public class ContactsX extends CordovaPlugin {
                 String mimeType = contactsCursor.getString(
                         contactsCursor.getColumnIndex(ContactsContract.Data.MIMETYPE)
                 );
+                contactsCursor.get
+                String type = '';
+                String label = '';
+                try {
+                    type = contactsCursor.getString(
+                          contactsCursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.CommonColumns.TYPE)
+                    );
+                    if (type == ContactsContract.CommonDataKinds.BaseTypes.TYPE_CUSTOM) {
+                        label = contactsCursor.getString(
+                                contactsCursor.getColumnIndex(ContactsContract.CommonDataKinds.CommonColumns.LABEL)
+                        );
+                    }
+                } catch (Exception ignored) {}
+
                 String data = contactsCursor.getString(
                         contactsCursor.getColumnIndex(ContactsContract.CommonDataKinds.Contactables.DATA)
                 );
+                JSONObject labeledValue = new JSONObject();
+                labeledValue.put("label", label);
 
                 assert jsContact != null;
                 switch (mimeType) {
+                    case ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE:
+                        JSONArray jsPostalAddresses = jsContact.getJSONArray("postalAddresses");
+                        String street = contactsCursor.getString(
+                                contactsCursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.STREET)
+                        );
+                        String city = contactsCursor.getString(
+                                contactsCursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.CITY)
+                        );
+                        String state = contactsCursor.getString(
+                                contactsCursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.REGION)
+                        );
+                        String postalCode = contactsCursor.getString(
+                                contactsCursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.POSTCODE)
+                        );
+                        String isoCountryCode = contactsCursor.getString(
+                                contactsCursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.COUNTRY)
+                        );
+                        JSONObject jsPostalAddress = new JSONObject();
+                        jsPostalAddress.put("street", street);
+                        jsPostalAddress.put("city", city);
+                        jsPostalAddress.put("state", state);
+                        jsPostalAddress.put("postalCode", postalCode);
+                        jsPostalAddress.put("isoCountryCode", isoCountryCode);
+                        labeledValue.put("value", jsPostalAddress);
+                        jsPostalAddresses.put(labeledValue);
+                        break;
+                    case ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE:
+                        JSONArray jsEmailAddresses = jsContact.getJSONArray("emailAddresses");
+                        labeledValue.put("value", data);
+                        jsEmailAddresses.put(labeledValue);
+                        break;
+                    case ContactsContract.CommonDataKinds.Website.CONTENT_ITEM_TYPE:
+                        JSONArray jsUrlAddresses = jsContact.getJSONArray("urlAddresses");
+                        labeledValue.put("value", data);
+                        jsUrlAddresses.put(labeledValue);
+                        break;
                     case ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE:
                         JSONArray jsPhoneNumbers = jsContact.getJSONArray("phoneNumbers");
-                        jsPhoneNumbers.put(data);
+                        labeledValue.put("value", data);
+                        jsPhoneNumbers.put(labeledValue);
                         break;
                     case ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE:
                         try {
+                            String namePrefix = contactsCursor.getString(contactsCursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.StructuredName.PREFIX));
                             String firstName = contactsCursor.getString(contactsCursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME));
                             String middleName = contactsCursor.getString(contactsCursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.StructuredName.MIDDLE_NAME));
                             String familyName = contactsCursor.getString(contactsCursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME));
+                            String nameSuffix = contactsCursor.getString(contactsCursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.StructuredName.SUFFIX));
+                            String jobTitle = contactsCursor.getString(contactsCursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Organization.JOB_DESCRIPTION));
+                            String organizationName = contactsCursor.getString(contactsCursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Organization.COMPANY));
+                            jsContact.put("namePrefix", firstName);
                             jsContact.put("firstName", firstName);
                             jsContact.put("middleName", middleName);
                             jsContact.put("familyName", familyName);
+                            jsContact.put("nameSuffix", nameSuffix);
+                            jsContact.put("jobTitle", jobTitle);
+                            jsContact.put("organizationName", organizationName);
                         } catch (IllegalArgumentException ignored) {
                         }
                         break;
